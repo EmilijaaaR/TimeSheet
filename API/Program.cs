@@ -9,12 +9,25 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using OfficeOpenXml;
+using Application.MediatorUserHandler;
+using Domain.UserEventsHandler;
+using MediatR.Pipeline;
+using Application.PreAndPostProcess;
 
 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var secretKey = jwtSettings["SecretKey"] ?? string.Empty;
+var expiryMinutes = double.Parse((jwtSettings["ExpiryMinutes"]) ?? "0");
+var issuer = jwtSettings["Issuer"] ?? string.Empty;
+var audience = jwtSettings["Audience"] ?? string.Empty;
+
+builder.Services.AddSingleton<string>(sp => builder.Configuration["Jwt:SecretKey"]!);
+builder.Services.AddSingleton<string>(sp => builder.Configuration["Jwt:ExpiryMinutes"]!);
+builder.Services.AddSingleton<string>(sp => builder.Configuration["Jwt:Issuer"]!);
+builder.Services.AddSingleton<string>(sp => builder.Configuration["Jwt:Audience"]!);
 
 builder.Services.AddDbContext<TimeSheetDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -38,11 +51,30 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<UserService>(provider =>
     new UserService(
         provider.GetRequiredService<IUnitOfWork>(),
-        jwtSettings["SecretKey"],
-        double.Parse(jwtSettings["ExpiryMinutes"]),
-        jwtSettings["Issuer"],
-        jwtSettings["Audience"]
+        secretKey,
+        expiryMinutes,
+        issuer,
+        audience
     ));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
+    typeof(CreateUserHandler).Assembly,
+    typeof(GetUserHandler).Assembly,
+    typeof(UpdateUserHandler).Assembly,
+    typeof(DeleteUserHandler).Assembly,
+    typeof(AuthenticateUserHandler).Assembly,
+    typeof(UserCreatedEventHandler).Assembly
+));
+builder.Services.AddTransient(typeof(IRequestPreProcessor<>), typeof(UserCreatePreProcessor<>));
+builder.Services.AddTransient(typeof(IRequestPostProcessor<,>), typeof(UserCreatePostProcessor<,>));
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder => builder
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -52,7 +84,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]);
+var key = Encoding.ASCII.GetBytes(secretKey);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -84,6 +116,8 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
+app.UseCors("AllowAll");
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -99,3 +133,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program();

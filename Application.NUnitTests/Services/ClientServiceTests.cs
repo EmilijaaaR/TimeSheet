@@ -306,7 +306,8 @@ namespace Application.NUnitTests.Services
         {
             // Arrange
             var userId = 1;
-            var user = new User { Id = userId, FirstName = "TestUser" };
+            var user = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user.Id = 1; 
             var clients = new List<Client>
             {
                 new Client { Id = 1, Name = "Client1" },

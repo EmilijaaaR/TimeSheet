@@ -23,6 +23,8 @@ namespace Application.NUnitTests.Services
         [Test]
         public async Task GenerateReportAsync_ShouldReturnReportViews()
         {
+            var user = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user.Id = 1;
             // Arrange
             var reportRequest = new ReportRequest
             {
@@ -43,7 +45,7 @@ namespace Application.NUnitTests.Services
                     CategoryId = 1,
                     Date = DateTime.Now.Date,
                     HoursWorked = 8,
-                    User = new User { FirstName = "John", LastName = "Doe" },
+                    User = user,
                     Project = new Project { Name = "Project A" },
                     Category = new Category { Name = "Development" }
                 },
@@ -54,7 +56,7 @@ namespace Application.NUnitTests.Services
                     CategoryId = 2,
                     Date = DateTime.Now.Date.AddDays(-1),
                     HoursWorked = 6,
-                    User = new User { FirstName = "Jane", LastName = "Smith" },
+                    User = user,
                     Project = new Project { Name = "Project B" },
                     Category = new Category { Name = "Testing" }
                 }

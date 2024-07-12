@@ -3,6 +3,7 @@ using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Domain.Entities;
 using Domain.Repositories;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace Infrastructure.NUnitTests.Repositories
 {

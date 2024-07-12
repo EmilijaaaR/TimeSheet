@@ -1,13 +1,14 @@
-﻿using Domain.Entities;
+﻿using Application.RequestEntities;
+using Domain.Entities;
 using Domain.Repositories;
 using System.Text;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
-using API.RequestEntities;
 using Application.ViewEntities;
 using Application.MappingExtension;
 using Application.Exceptions;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Application.Services
 {
@@ -22,21 +23,16 @@ namespace Application.Services
         public UserService(IUnitOfWork unitOfWork, string secretKey, double expiryMinutes, string issuer, string audience)
         {
             _unitOfWork = unitOfWork;
+            _secretKey = secretKey;
+            _expiryMinutes = expiryMinutes;
+            _issuer = issuer;
+            _audience = audience;
         }
 
         public async Task<UserView> CreateAsync(UserRequest userRequest)
         {
             var (hash, salt) = HashPassword(userRequest.Password);
-
-            var user = new User
-            {
-                FirstName = userRequest.FirstName,
-                LastName = userRequest.LastName,
-                Username = userRequest.Username,
-                PasswordHash = hash,
-                PasswordSalt = salt
-            };
-
+            var user = new User(userRequest.FirstName, userRequest.LastName, userRequest.Username, hash, salt);
             await _unitOfWork.UserRepository.InsertAsync(user);
             await _unitOfWork.SaveChangesAsync();
 
@@ -58,16 +54,6 @@ namespace Application.Services
         public async Task<UserView> GetByIdAsync(int id)
         {
             var user = await _unitOfWork.UserRepository.GetByIdAsync(id);
-            if (user == null)
-            {
-                throw new ArgumentException("User does not exist.");
-            }
-            return user.ToView();
-        }
-
-        public async Task<UserView> GetByUsernameAsync(string username)
-        {
-            var user = await _unitOfWork.UserRepository.GetByUsernameAsync(username);
             if (user == null)
             {
                 throw new ArgumentException("User does not exist.");
@@ -131,7 +117,6 @@ namespace Application.Services
             {
                 throw new InvalidCredentialsException();
             }
-
             if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
                 throw new InvalidCredentialsException();

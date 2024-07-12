@@ -33,8 +33,8 @@ namespace Infrastructure.NUnitTests.Repositories
         public async Task InsertAsync_ShouldInsertUser()
         {
             // Arrange
-            var user = new User { Id = 1, FirstName = "Test User", LastName = "Test User", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" };
-
+            var user = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user.Id = 1;
             // Act
             await _userRepository.InsertAsync(user);
             await _dbContext.SaveChangesAsync();
@@ -48,8 +48,10 @@ namespace Infrastructure.NUnitTests.Repositories
         public async Task GetByIdAsync_ShouldReturnCorrectUser()
         {
             // Arrange
-            var user = new User { Id = 1, FirstName = "Test User", LastName = "Test User", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" };
-            var user2 = new User { Id = 2, FirstName = "Test User2", LastName = "Test User2", PasswordHash = "hash2", PasswordSalt = "salt2", Username = "UsernameTest2" };
+            var user = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user.Id = 1; 
+            var user2 = new User("Test User2", "Test User2", "UsernameTest2", "hash2", "salt2");
+            user2.Id = 2;
 
             await _dbContext.Users.AddRangeAsync(user,user2);
             await _dbContext.SaveChangesAsync();
@@ -66,8 +68,10 @@ namespace Infrastructure.NUnitTests.Repositories
         public async Task GetByUsernameAsync_ShouldReturnCorrectUser()
         {
             // Arrange
-            var user = new User { Id = 1, FirstName = "Test User", LastName = "Test User", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" };
-            var user2 = new User { Id = 2, FirstName = "Test User2", LastName = "Test User2", PasswordHash = "hash2", PasswordSalt = "salt2", Username = "UsernameTest2" };
+            var user = new User ("Test User", "Test User", "UsernameTest", "hash", "salt" );
+            user.Id = 1;
+            var user2 = new User ("Test User2", "Test User2", "UsernameTest2", "hash2", "salt2" );
+            user2.Id = 2;
             var username = "UsernameTest";
             await _dbContext.Users.AddRangeAsync(user, user2);
             await _dbContext.SaveChangesAsync();
@@ -84,7 +88,8 @@ namespace Infrastructure.NUnitTests.Repositories
         public async Task DeleteAsync_ShouldRemoveUser()
         {
             // Arrange
-            var user = new User { Id = 1, FirstName = "Test User", LastName = "Test User", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" };
+            var user = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user.Id = 1; 
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
 
@@ -100,9 +105,10 @@ namespace Infrastructure.NUnitTests.Repositories
         public async Task GetAllAsync_ShouldReturnAllUsers()
         {
             // Arrange
-            var user1 = new User { Id = 1, FirstName = "Test User1", LastName = "Test User1", PasswordHash = "hash1", PasswordSalt = "salt1", Username = "UsernameTest1" };
-            var user2 = new User { Id = 2, FirstName = "Test User2", LastName = "Test User2", PasswordHash = "hash2", PasswordSalt = "salt2", Username = "UsernameTest2" };
-
+            var user1 = new User("Test User1", "Test User1", "UsernameTest1", "hash1", "salt1");
+            user1.Id = 1;
+            var user2 = new User("Test User2", "Test User2", "UsernameTest2", "hash2", "salt2");
+            user1.Id = 2;
             await _dbContext.Users.AddRangeAsync(user1, user2);
             await _dbContext.SaveChangesAsync();
 
@@ -149,7 +155,8 @@ namespace Infrastructure.NUnitTests.Repositories
         public async Task ExistsAsync_ShouldReturnTrueIfExists()
         {
             // Arrange
-            var user = new User { Id = 1, FirstName = "Test User", LastName = "Test User", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" };
+            var user = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user.Id = 1;
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
 

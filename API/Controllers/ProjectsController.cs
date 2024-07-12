@@ -37,24 +37,6 @@ namespace API.Controllers
             return Ok(projects);
         }
 
-        //[HttpGet]
-        //[ProducesResponseType(typeof(IEnumerable<ProjectView>), 200)]
-        //[ProducesResponseType(400)]
-        //public async Task<IActionResult> GetAll()
-        //{
-        //    var projects = await _projectService.GetAllAsync();
-        //    return Ok(projects);
-        //}
-
-        //[HttpGet("{id}")]
-        //[ProducesResponseType(typeof(ProjectView), 200)]
-        //[ProducesResponseType(400)]
-        //public async Task<IActionResult> GetById(int id)
-        //{
-        //    var project = await _projectService.GetByIdAsync(id);
-        //    return Ok(project);
-        //}
-
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(200)]

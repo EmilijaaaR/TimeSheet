@@ -111,7 +111,8 @@ namespace Infrastructure.NUnitTests.Repositories
         public async Task SaveChangesAsync_ShouldSaveChanges()
         {
             // Arrange
-            var user = new User { Id = 1, FirstName = "Another User", LastName = "Another LastName", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" };
+            var user = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user.Id = 1;
             _dbContext.Users.Add(user);
 
             // Act

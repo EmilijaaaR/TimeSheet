@@ -1,11 +1,13 @@
-﻿using API.RequestEntities;
+﻿using Application.RequestEntities;
 using Application.Services;
 using Application.ViewEntities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    public class LoginAndRegistrationController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class LoginAndRegistrationController : ControllerBase
     {
         private readonly UserService _userService;
 

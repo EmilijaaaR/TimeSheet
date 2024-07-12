@@ -1,10 +1,14 @@
-﻿using API.RequestEntities;
+﻿using Application.RequestEntities;
 using Application.Exceptions;
 using Application.Services;
 using Domain.Entities;
 using Domain.Repositories;
+using Microsoft.IdentityModel.Tokens;
 using Moq;
 using NUnit.Framework.Legacy;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace Application.NUnitTests.Services
 {
@@ -13,7 +17,7 @@ namespace Application.NUnitTests.Services
     {
         private Mock<IUnitOfWork> _mockUnitOfWork;
         private UserService _userService;
-        private string _secretKey = "your_secret_key";
+        private string _secretKey = "your_very_long_secret_key_which_is_32_bytes_long!!";
         private double _expiryMinutes = 30;
         private string _issuer = "your_issuer";
         private string _audience = "your_audience";
@@ -83,15 +87,8 @@ namespace Application.NUnitTests.Services
         public async Task GetByIdAsync_ShouldReturnUserView()
         {
             // Arrange
-            var user = new User
-            {
-                Id = 1,
-                FirstName = "John",
-                LastName = "Doe",
-                Username = "johndoe",
-                PasswordHash = "hashedpassword",
-                PasswordSalt = "salt"
-            };
+            var user = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user.Id = 1;
 
             _mockUnitOfWork.Setup(u => u.UserRepository.GetByIdAsync(1))
                 .ReturnsAsync(user);
@@ -129,15 +126,8 @@ namespace Application.NUnitTests.Services
                 Password = "newpassword123"
             };
 
-            var user = new User
-            {
-                Id = 1,
-                FirstName = "John",
-                LastName = "Doe",
-                Username = "johndoe",
-                PasswordHash = "hashedpassword",
-                PasswordSalt = "salt"
-            };
+            var user = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user.Id = 1;
 
             _mockUnitOfWork.Setup(u => u.UserRepository.GetByIdAsync(1))
                 .ReturnsAsync(user);
@@ -177,15 +167,8 @@ namespace Application.NUnitTests.Services
         public async Task DeleteAsync_ShouldDeleteUser()
         {
             // Arrange
-            var user = new User
-            {
-                Id = 1,
-                FirstName = "John",
-                LastName = "Doe",
-                Username = "johndoe",
-                PasswordHash = "hashedpassword",
-                PasswordSalt = "salt"
-            };
+            var user = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user.Id = 1;
 
             var userRoles = new List<UserRole>
     {
@@ -228,11 +211,14 @@ namespace Application.NUnitTests.Services
         [Test]
         public async Task GetAllAsync_ShouldReturnAllUsers()
         {
+            var user1 = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user1.Id = 1;
+            var user2 = new User("Test User2", "Test User2", "UsernameTest2", "hash2", "salt2");
+            user2.Id = 2;
             // Arrange
             var users = new List<User>
             {
-                new User { Id = 1, FirstName = "John", LastName = "Doe", Username = "johndoe" },
-                new User { Id = 2, FirstName = "Jane", LastName = "Smith", Username = "janesmith" }
+                user1, user2
             };
 
             _mockUnitOfWork.Setup(u => u.UserRepository.GetAllAsync())
@@ -282,13 +268,8 @@ namespace Application.NUnitTests.Services
             var salt = BCrypt.Net.BCrypt.GenerateSalt();
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password, salt);
 
-            var user = new User
-            {
-                Id = 1,
-                Username = username,
-                PasswordHash = hashedPassword,
-                PasswordSalt = salt
-            };
+            var user = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user.Id = 1;
 
             var roles = new List<string> { "User" };
 
@@ -328,13 +309,8 @@ namespace Application.NUnitTests.Services
             var salt = BCrypt.Net.BCrypt.GenerateSalt();
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword("password123", salt);
 
-            var user = new User
-            {
-                Id = 1,
-                Username = username,
-                PasswordHash = hashedPassword,
-                PasswordSalt = salt
-            };
+            var user = new User("Test User", "Test User", "johndoe", hashedPassword, salt);
+            user.Id = 1;
 
             _mockUnitOfWork.Setup(u => u.UserRepository.GetByUsernameAsync(username))
                 .ReturnsAsync(user);
@@ -343,5 +319,37 @@ namespace Application.NUnitTests.Services
             Assert.ThrowsAsync<InvalidCredentialsException>(() => _userService.AuthenticateAsync(username, password));
         }
 
+        [Test]
+        public void GenerateJwtToken_ShouldGenerateValidToken()
+        {
+            // Arrange
+            var username = "testuser";
+            var roles = new List<string> { "Admin", "User" };
+
+            // Act
+            var token = _userService.GenerateJwtToken(username, roles);
+
+            // Assert
+            ClassicAssert.IsNotNull(token);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_secretKey);
+
+            tokenHandler.ValidateToken(token, new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = true,
+                ValidIssuer = _issuer,
+                ValidateAudience = true,
+                ValidAudience = _audience,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            }, out SecurityToken validatedToken);
+
+            var jwtToken = (JwtSecurityToken)validatedToken;
+            ClassicAssert.IsNotNull(jwtToken);
+            ClassicAssert.IsTrue(jwtToken.Claims.Any(x => x.Type == "role" && x.Value == "Admin"));
+            ClassicAssert.IsTrue(jwtToken.Claims.Any(x => x.Type == "role" && x.Value == "User"));
+        }
     }
 }

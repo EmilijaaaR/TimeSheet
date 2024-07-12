@@ -18,15 +18,6 @@ namespace API.Controllers
             _timesheetService = timesheetService;
         }
 
-        //[HttpGet("{id}")]
-        //[ProducesResponseType(200)]
-        //[ProducesResponseType(400)]
-        //public async Task<IActionResult> GetById(int id)
-        //{
-        //    var timesheet = await _timesheetService.GetByIdAsync(id);
-        //    return Ok(timesheet);
-        //}
-
         [HttpPost]
         [Authorize(Roles = "Admin, User")]
         [ProducesResponseType(typeof(Timesheet), 200)]
@@ -59,7 +50,6 @@ namespace API.Controllers
         }
 
         [HttpPut("update")]
-        [Authorize(Roles = "Admin, User")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> UpdateTimesheetsWithStatus(int userId, DateTime startDate, DateTime endDate, [FromBody] IEnumerable<TimesheetUpdateRequest> timesheetRequests)

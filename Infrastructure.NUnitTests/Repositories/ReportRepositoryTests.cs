@@ -38,12 +38,15 @@ namespace Infrastructure.NUnitTests.Repositories
         [Test]
         public async Task GetReportDataAsync_ShouldReturnTimesheetsFilteredByUserId()
         {
-            var user = new User { Id = 1, FirstName = "Test User", LastName = "Test User", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" };
+            var user1 = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user1.Id = 1;
+            var user2 = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user2.Id = 2;
             var timesheet1 = new Timesheet
             {
                 Id = 1,
                 UserId = 1,
-                User = user,
+                User = user1,
                 Date = DateTime.UtcNow,
                 ProjectId = 1,
                 CategoryId = 1,
@@ -77,7 +80,7 @@ namespace Infrastructure.NUnitTests.Repositories
             {
                 Id = 2,
                 UserId = 2,
-                User = new User { Id = 2, FirstName = "Another User", LastName = "Another LastName", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" },
+                User = user2,
                 Date = DateTime.UtcNow,
                 ProjectId = 2,
                 CategoryId = 2,
@@ -97,7 +100,7 @@ namespace Infrastructure.NUnitTests.Repositories
                 },
                 Category = new Category { Id = 2, Name = "Another Category" }
             };
-            _dbContext.Users.Add(user);
+            _dbContext.Users.Add(user1);
             _dbContext.Timesheets.AddRange(timesheet1, timesheet2);
             await _dbContext.SaveChangesAsync();
 
@@ -140,7 +143,8 @@ namespace Infrastructure.NUnitTests.Repositories
                 ProjectUsers = new List<ProjectUser>(),
                 Timesheets = new List<Timesheet>()
             };
-            var user = new User { Id = 1, FirstName = "Test User", LastName = "Test User", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" };
+            var user = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user.Id = 1; 
             var timesheet1 = new Timesheet
             {
                 Id = 1,
@@ -155,11 +159,13 @@ namespace Infrastructure.NUnitTests.Repositories
                 Project = project,
                 Category = new Category { Id = 1, Name = "Test Category" }
             };
+            var user2 = new User("Test User2", "Test User2", "UsernameTest2", "hash2", "salt2");
+            user2.Id = 2;
             var timesheet2 = new Timesheet
             {
                 Id = 2,
                 UserId = 2,
-                User = new User { Id = 2, FirstName = "Another User", LastName = "Another LastName", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" },
+                User = user2,
                 Date = DateTime.UtcNow,
                 ProjectId = 2,
                 CategoryId = 2,
@@ -215,7 +221,8 @@ namespace Infrastructure.NUnitTests.Repositories
                 ProjectUsers = new List<ProjectUser>(),
                 Timesheets = new List<Timesheet>()
             };
-            var user = new User { Id = 1, FirstName = "Test User", LastName = "Test User", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" };
+            var user = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user.Id = 1; 
             var timesheet1 = new Timesheet
             {
                 Id = 1,
@@ -230,11 +237,13 @@ namespace Infrastructure.NUnitTests.Repositories
                 Project = project,
                 Category = new Category { Id = 1, Name = "Test Category" }
             };
+            var user2 = new User("Test User2", "Test User2", "UsernameTest2", "hash2", "salt2");
+            user2.Id = 2;
             var timesheet2 = new Timesheet
             {
                 Id = 2,
                 UserId = 2,
-                User = new User { Id = 2, FirstName = "Another User", LastName = "Another LastName", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" },
+                User = user2,
                 Date = DateTime.UtcNow,
                 ProjectId = 2,
                 CategoryId = 2,
@@ -314,7 +323,8 @@ namespace Infrastructure.NUnitTests.Repositories
                 ProjectUsers = new List<ProjectUser>(),
                 Timesheets = new List<Timesheet>()
             };
-            var user = new User { Id = 1, FirstName = "Test User", LastName = "Test User", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" };
+            var user = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user.Id = 1; 
             var timesheet1 = new Timesheet
             {
                 Id = 1,
@@ -329,11 +339,13 @@ namespace Infrastructure.NUnitTests.Repositories
                 Project = project,
                 Category = category
             };
+            var user2 = new User("Test User2", "Test User2", "UsernameTest2", "hash2", "salt2");
+            user2.Id = 2;
             var timesheet2 = new Timesheet
             {
                 Id = 2,
                 UserId = 2,
-                User = new User { Id = 2, FirstName = "Another User", LastName = "Another LastName", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" },
+                User = user2,
                 Date = DateTime.UtcNow,
                 ProjectId = 2,
                 CategoryId = 1,
@@ -403,7 +415,8 @@ namespace Infrastructure.NUnitTests.Repositories
                 ProjectUsers = new List<ProjectUser>(),
                 Timesheets = new List<Timesheet>()
             };
-            var user = new User { Id = 1, FirstName = "Test User", LastName = "Test User", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" };
+            var user = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user.Id = 1; 
             var timesheet1 = new Timesheet
             {
                 Id = 1,
@@ -418,11 +431,13 @@ namespace Infrastructure.NUnitTests.Repositories
                 Project = project,
                 Category = category
             };
+            var user2 = new User("Test User2", "Test User2", "UsernameTest2", "hash2", "salt2");
+            user2.Id = 2;
             var timesheet2 = new Timesheet
             {
                 Id = 2,
                 UserId = 2,
-                User = new User { Id = 2, FirstName = "Another User", LastName = "Another LastName", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" },
+                User = user2,
                 Date = DateTime.UtcNow,
                 ProjectId = 2,
                 CategoryId = 1,
@@ -493,7 +508,8 @@ namespace Infrastructure.NUnitTests.Repositories
                 ProjectUsers = new List<ProjectUser>(),
                 Timesheets = new List<Timesheet>()
             };
-            var user = new User { Id = 1, FirstName = "Test User", LastName = "Test User", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" };
+            var user = new User("Test User", "Test User", "UsernameTest", "hash", "salt");
+            user.Id = 1; 
             var timesheet1 = new Timesheet
             {
                 Id = 1,
@@ -508,11 +524,13 @@ namespace Infrastructure.NUnitTests.Repositories
                 Project = project,
                 Category = category
             };
+            var user2 = new User("Test User2", "Test User2", "UsernameTest2", "hash2", "salt2");
+            user2.Id = 2;
             var timesheet2 = new Timesheet
             {
                 Id = 2,
                 UserId = 2,
-                User = new User { Id = 2, FirstName = "Another User", LastName = "Another LastName", PasswordHash = "hash", PasswordSalt = "salt", Username = "UsernameTest" },
+                User = user2,
                 Date = DateTime.UtcNow,
                 ProjectId = 2,
                 CategoryId = 1,
